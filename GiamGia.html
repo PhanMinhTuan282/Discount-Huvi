@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8" />
-        <title>Khuyến mãi ngẫu nhiên</title>
+        <title>Huvi Khuyến Mãi</title>
         <style>
             body {
                 text-align: center;
@@ -10,20 +10,104 @@
                 margin-top: 100px;
             }
             .discount {
-                font-size: 48px;
+                font-size: 80px;
+                font-weight: 600;
                 color: red;
+            }
+            .emoji {
+                display: none; /* Ẩn ban đầu */
+                justify-content: space-around;
+                font-size: 25px;
+                margin-top: 20px;
+            }
+            img {
+                width: 70px;
+                height: 70px;
             }
         </style>
     </head>
     <body>
-        <h1>Chúc mừng bạn nhận được mức giảm giá:</h1>
-        <div class="discount" id="discount"></div>
+        <div
+            style="
+                width: 500px;
+                height: 380px;
+                background-color: #d7ecef;
+                border: 1px solid #56aab4;
+                border-radius: 50px;
+                margin: auto;
+            "
+        >
+            <h1
+                style="
+                    border-radius: 50px 50px 0 0;
+                    background-color: #56aab4;
+                    color: white;
+                    margin: 0;
+                    padding: 0;
+                    line-height: 1.5;
+                    font-size: 50px;
+                "
+            >
+                Huvi Square
+            </h1>
+            <h1>Chúc mừng bạn nhận được mức giảm giá:</h1>
+            <div class="discount" id="discount"></div>
+
+            <!-- Emoji theo mức giảm giá -->
+            <div class="emoji e5">
+                <p>Lần sau sẽ may mắn hơn thôi</p>
+                <img src="./images/emoji/wechatsly.png" alt="" />
+            </div>
+            <div class="emoji e6">
+                <p>Bonus hoa này, sau lại ghé nhé</p>
+                <img src="./images/emoji/Casada.png" alt="" />
+            </div>
+            <div class="emoji e7">
+                <p>Oaa, lần sau phải dẫn thêm bạn đến nhé</p>
+                <img src="./images/emoji/aha.png" alt="" />
+            </div>
+            <div class="emoji e8">
+                <p>Lần tới chắc chắn bạn sẽ may mắn hơn nữa</p>
+                <img src="./images/emoji/Holdingheartemoji.png" alt="" />
+            </div>
+            <div class="emoji e9">
+                <p>Ôi, đỉnh nóc kịch trần bay phất phới</p>
+                <img src="./images/emoji/Sigh.png" alt="" />
+            </div>
+            <div class="emoji e10">
+                <p>Ối zồi ôi, Bạn may mắn thật đó</p>
+                <img src="./images/emoji/rishi.png" alt="" />
+            </div>
+        </div>
 
         <script>
-            const discounts = [5, 10, 15, 20];
+            const options = [
+                { value: 5, weight: 35 },
+                { value: 6, weight: 20 },
+                { value: 7, weight: 15 },
+                { value: 8, weight: 15 },
+                { value: 9, weight: 10 },
+                { value: 10, weight: 5 },
+            ];
+
+            // Tạo mảng "phẳng" theo trọng số
+            const weighted = options.flatMap((opt) =>
+                Array(opt.weight).fill(opt.value)
+            );
             const selected =
-                discounts[Math.floor(Math.random() * discounts.length)];
+                weighted[Math.floor(Math.random() * weighted.length)];
+
+            // Hiển thị giảm giá
             document.getElementById("discount").innerText = selected + "%";
+
+            // Ẩn tất cả emoji
+            document
+                .querySelectorAll(".emoji")
+                .forEach((el) => (el.style.display = "none"));
+
+            // Hiện emoji tương ứng
+            const emojiDiv = document.querySelector(`.emoji.e${selected}`);
+            if (emojiDiv) emojiDiv.style.display = "flex";
         </script>
     </body>
 </html>
