@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
     <head>
         <meta charset="UTF-8" />
         <title>Huvi Khuyến Mãi</title>
@@ -9,13 +9,12 @@
                 font-family: sans-serif;
                 margin-top: 100px;
             }
-            .discount {
-                font-size: 80px;
-                font-weight: 600;
-                color: red;
+            canvas {
+                margin-top: 20px;
+                font-size: 25px;
             }
             .emoji {
-                display: none; /* Ẩn ban đầu */
+                display: none;
                 justify-content: space-around;
                 align-items: center;
                 font-size: 40px;
@@ -25,19 +24,55 @@
                 width: 70px;
                 height: 70px;
             }
+            #spin {
+                padding: 10px 20px;
+                font-size: 30px;
+                background: #56aab4;
+                color: white;
+                border: none;
+                border-radius: 10px;
+                margin-top: 20px;
+                cursor: pointer;
+            }
         </style>
     </head>
     <body>
         <div
             style="
                 width: 80%;
-                height: 400px;
                 background-color: #d7ecef;
                 border: 1px solid #56aab4;
                 border-radius: 50px;
                 margin: auto;
+                padding-bottom: 40px;
+                position: relative;
             "
         >
+            <div
+                style="
+                    position: absolute;
+                    width: 40;
+                    height: 40px;
+                    top: 350px;
+                    left: 75%;
+                "
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="64"
+                    height="64"
+                    viewBox="0 0 64 64"
+                >
+                    <path
+                        fill="#1b75bb"
+                        d="M63.792 56.913a6.877 6.877 0 0 1-6.878 6.882H6.874A6.88 6.88 0 0 1 0 56.913V6.877A6.876 6.876 0 0 1 6.874 0h50.041a6.876 6.876 0 0 1 6.878 6.877z"
+                    />
+                    <path
+                        fill="#fff"
+                        d="M28.04 47.85L9.578 31.958l18.285-15.965c2.563.188 4.582 1.897 4.589 3.986l.018 3.55l16.654-.09a5.083 5.083 0 0 1 5.11 5.05l.031 6.583a5.077 5.077 0 0 1-5.05 5.103l-16.656.087l.018 3.546c.014 2.087-1.973 3.816-4.535 4.04"
+                    />
+                </svg>
+            </div>
             <h1
                 style="
                     border-radius: 50px 50px 0 0;
@@ -51,64 +86,140 @@
             >
                 Huvi Square
             </h1>
-            <h1>Chúc mừng bạn nhận được mức giảm giá:</h1>
-            <div class="discount" id="discount"></div>
+            <h1>Chúc bạn may mắn với vòng quay:</h1>
+
+            <!-- Vòng quay -->
+            <canvas id="wheel" width="400" height="400"></canvas>
+            <button id="spin">Quay</button>
 
             <!-- Emoji theo mức giảm giá -->
             <div class="emoji e5">
                 <p>Lần sau sẽ may mắn hơn thôi</p>
-                <img src="./images/emoji/wechatsly.png" alt="" />
+                <img src="./images/emoji/wechatsly.png" />
             </div>
             <div class="emoji e6">
                 <p>Bonus hoa này, sau lại ghé nhé</p>
-                <img src="./images/emoji/Casada.png" alt="" />
+                <img src="./images/emoji/Casada.png" />
             </div>
             <div class="emoji e7">
                 <p>Oaa, lần sau phải dẫn thêm bạn đến nhé</p>
-                <img src="./images/emoji/aha.png" alt="" />
+                <img src="./images/emoji/aha.png" />
             </div>
             <div class="emoji e8">
                 <p>Lần tới chắc chắn bạn sẽ may mắn hơn nữa</p>
-                <img src="./images/emoji/Holdingheartemoji.png" alt="" />
+                <img src="./images/emoji/Holdingheartemoji.png" />
             </div>
             <div class="emoji e9">
                 <p>Ôi, đỉnh nóc kịch trần bay phất phới</p>
-                <img src="./images/emoji/Sigh.png" alt="" />
+                <img src="./images/emoji/Sigh.png" />
             </div>
             <div class="emoji e10">
                 <p>Ối zồi ôi, Bạn may mắn thật đó</p>
-                <img src="./images/emoji/rishi.png" alt="" />
+                <img src="./images/emoji/rishi.png" />
             </div>
         </div>
 
         <script>
+            const canvas = document.getElementById("wheel");
+            const ctx = canvas.getContext("2d");
+            const size = canvas.width;
+            const radius = size / 2;
+            const center = { x: radius, y: radius };
+
             const options = [
-                { value: 5, weight: 35 },
-                { value: 6, weight: 20 },
-                { value: 7, weight: 15 },
-                { value: 8, weight: 15 },
-                { value: 9, weight: 10 },
-                { value: 10, weight: 5 },
+                { value: 5, weight: 35, color: "#FFD700" },
+                { value: 6, weight: 20, color: "#FF8C00" },
+                { value: 7, weight: 15, color: "#ADFF2F" },
+                { value: 8, weight: 15, color: "#00CED1" },
+                { value: 9, weight: 10, color: "#BA55D3" },
+                { value: 10, weight: 5, color: "#DC143C" },
             ];
 
-            // Tạo mảng "phẳng" theo trọng số
             const weighted = options.flatMap((opt) =>
-                Array(opt.weight).fill(opt.value)
+                Array(opt.weight).fill(opt)
             );
-            const selected =
-                weighted[Math.floor(Math.random() * weighted.length)];
+            const segments = options.length;
+            const arc = (2 * Math.PI) / segments;
 
-            // Hiển thị giảm giá
-            document.getElementById("discount").innerText = selected + "%";
+            function drawWheel() {
+                for (let i = 0; i < segments; i++) {
+                    const opt = options[i];
+                    ctx.beginPath();
+                    ctx.moveTo(center.x, center.y);
+                    ctx.fillStyle = opt.color;
+                    ctx.arc(center.x, center.y, radius, i * arc, (i + 1) * arc);
+                    ctx.lineTo(center.x, center.y);
+                    ctx.fill();
 
-            // Ẩn tất cả emoji
-            document
-                .querySelectorAll(".emoji")
-                .forEach((el) => (el.style.display = "none"));
+                    // Vẽ số %
+                    ctx.fillStyle = "black";
+                    ctx.font = "bold 20px sans-serif";
+                    const angle = i * arc + arc / 2;
+                    const x = center.x + Math.cos(angle) * radius * 0.6;
+                    const y = center.y + Math.sin(angle) * radius * 0.6;
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(angle);
+                    ctx.fillText(opt.value + "%", -15, 5);
+                    ctx.restore();
+                }
+            }
 
-            // Hiện emoji tương ứng
-            const emojiDiv = document.querySelector(`.emoji.e${selected}`);
-            if (emojiDiv) emojiDiv.style.display = "flex";
+            drawWheel();
+
+            const spinBtn = document.getElementById("spin");
+
+            let angle = 0;
+            spinBtn.onclick = function () {
+                spinBtn.disabled = true;
+
+                // Ẩn tất cả emoji
+                document
+                    .querySelectorAll(".emoji")
+                    .forEach((e) => (e.style.display = "none"));
+
+                const selected =
+                    weighted[Math.floor(Math.random() * weighted.length)];
+                const index = options.findIndex(
+                    (o) => o.value === selected.value
+                );
+                const fullRotations = 5;
+                const stopAngle = (segments - index) * arc - arc / 2;
+                const finalAngle = 2 * Math.PI * fullRotations + stopAngle;
+
+                let start = null;
+                const duration = 4000;
+
+                function animate(timestamp) {
+                    if (!start) start = timestamp;
+                    const progress = timestamp - start;
+
+                    const ease = (t) => 1 - Math.pow(1 - t, 3);
+                    const t = Math.min(1, progress / duration);
+                    angle = ease(t) * finalAngle;
+
+                    ctx.clearRect(0, 0, size, size);
+                    ctx.save();
+                    ctx.translate(center.x, center.y);
+                    ctx.rotate(angle);
+                    ctx.translate(-center.x, -center.y);
+                    drawWheel();
+                    ctx.restore();
+
+                    if (t < 1) {
+                        requestAnimationFrame(animate);
+                    } else {
+                        // Hiện emoji tương ứng
+                        const emojiDiv = document.querySelector(
+                            `.emoji.e${selected.value}`
+                        );
+                        if (emojiDiv) emojiDiv.style.display = "flex";
+                        spinBtn.disabled = false;
+                    }
+                }
+
+                requestAnimationFrame(animate);
+            };
         </script>
     </body>
 </html>
