@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" />
+        <title>Khuyến mãi ngẫu nhiên</title>
+        <style>
+            body {
+                text-align: center;
+                font-family: sans-serif;
+                margin-top: 100px;
+            }
+            .discount {
+                font-size: 48px;
+                color: red;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Chúc mừng bạn nhận được mức giảm giá:</h1>
+        <div class="discount" id="discount"></div>
+
+        <script>
+            const discounts = [5, 10, 15, 20];
+            const selected =
+                discounts[Math.floor(Math.random() * discounts.length)];
+            document.getElementById("discount").innerText = selected + "%";
+        </script>
+    </body>
+</html>
