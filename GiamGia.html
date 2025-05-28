@@ -11,7 +11,6 @@
             }
             canvas {
                 margin-top: 20px;
-                font-size: 25px;
             }
             .emoji {
                 display: none;
@@ -92,12 +91,12 @@
             <canvas id="wheel" width="400" height="400"></canvas>
             <button id="spin">Quay</button>
 
-            <!-- Emoji theo mức giảm giá -->
+            <!-- Emoji tương ứng -->
             <div class="emoji e5">
                 <p>Lần sau sẽ may mắn hơn thôi</p>
                 <img src="./images/emoji/wechatsly.png" />
             </div>
-            <div class="emoji e6">
+            <div class="emoji eMaymanlansau">
                 <p>Bonus hoa này, sau lại ghé nhé</p>
                 <img src="./images/emoji/Casada.png" />
             </div>
@@ -105,11 +104,7 @@
                 <p>Oaa, lần sau phải dẫn thêm bạn đến nhé</p>
                 <img src="./images/emoji/aha.png" />
             </div>
-            <div class="emoji e8">
-                <p>Lần tới chắc chắn bạn sẽ may mắn hơn nữa</p>
-                <img src="./images/emoji/Holdingheartemoji.png" />
-            </div>
-            <div class="emoji e9">
+            <div class="emoji eBimBim">
                 <p>Ôi, đỉnh nóc kịch trần bay phất phới</p>
                 <img src="./images/emoji/Sigh.png" />
             </div>
@@ -128,10 +123,9 @@
 
             const options = [
                 { value: 5, weight: 35, color: "#FFD700" },
-                { value: 6, weight: 20, color: "#FF8C00" },
-                { value: 7, weight: 15, color: "#ADFF2F" },
-                { value: 8, weight: 15, color: "#00CED1" },
-                { value: 9, weight: 10, color: "#BA55D3" },
+                { value: "May man lan sau", weight: 20, color: "#FF8C00" },
+                { value: 7, weight: 25, color: "#ADFF2F" },
+                { value: "Bim Bim", weight: 15, color: "#00CED1" },
                 { value: 10, weight: 5, color: "#DC143C" },
             ];
 
@@ -140,6 +134,17 @@
             );
             const segments = options.length;
             const arc = (2 * Math.PI) / segments;
+
+            function normalizeEmojiKey(value) {
+                if (typeof value === "number") return `e${value}`;
+                return (
+                    "e" +
+                    value
+                        .replace(/\s+/g, "")
+                        .normalize("NFD")
+                        .replace(/[\u0300-\u036f]/g, "")
+                );
+            }
 
             function drawWheel() {
                 for (let i = 0; i < segments; i++) {
@@ -151,16 +156,20 @@
                     ctx.lineTo(center.x, center.y);
                     ctx.fill();
 
-                    // Vẽ số %
+                    // Vẽ nhãn
                     ctx.fillStyle = "black";
-                    ctx.font = "bold 20px sans-serif";
+                    ctx.font = "bold 18px sans-serif";
                     const angle = i * arc + arc / 2;
                     const x = center.x + Math.cos(angle) * radius * 0.6;
                     const y = center.y + Math.sin(angle) * radius * 0.6;
                     ctx.save();
                     ctx.translate(x, y);
                     ctx.rotate(angle);
-                    ctx.fillText(opt.value + "%", -15, 5);
+                    const label =
+                        typeof opt.value === "number"
+                            ? opt.value + "%"
+                            : opt.value;
+                    ctx.fillText(label, -ctx.measureText(label).width / 2, 5);
                     ctx.restore();
                 }
             }
@@ -168,12 +177,10 @@
             drawWheel();
 
             const spinBtn = document.getElementById("spin");
-
             let angle = 0;
+
             spinBtn.onclick = function () {
                 spinBtn.disabled = true;
-
-                // Ẩn tất cả emoji
                 document
                     .querySelectorAll(".emoji")
                     .forEach((e) => (e.style.display = "none"));
@@ -193,7 +200,6 @@
                 function animate(timestamp) {
                     if (!start) start = timestamp;
                     const progress = timestamp - start;
-
                     const ease = (t) => 1 - Math.pow(1 - t, 3);
                     const t = Math.min(1, progress / duration);
                     angle = ease(t) * finalAngle;
@@ -209,9 +215,9 @@
                     if (t < 1) {
                         requestAnimationFrame(animate);
                     } else {
-                        // Hiện emoji tương ứng
+                        const emojiClass = normalizeEmojiKey(selected.value);
                         const emojiDiv = document.querySelector(
-                            `.emoji.e${selected.value}`
+                            `.emoji.${emojiClass}`
                         );
                         if (emojiDiv) emojiDiv.style.display = "flex";
                         spinBtn.disabled = false;
